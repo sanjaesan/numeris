@@ -1,0 +1,256 @@
+syntax = "proto3";
+
+package invoice;
+option go_package = "github.com/numeris/pkg/proto";
+
+import "google/protobuf/timestamp.proto";
+
+
+// Service definition
+service InvoiceService {
+  // Create a new invoice
+  rpc CreateInvoice(CreateInvoiceRequest) returns (CreateInvoiceResponse);
+
+  // Update an invoice
+  rpc UpdateInvoice(UpdateInvoiceRequest) returns (UpdateInvoiceResponse);
+
+  // Delete an invoice
+  rpc DeleteInvoice(DeleteInvoiceRequest) returns (DeleteInvoiceResponse);
+  
+  // Get an invoice by ID
+  rpc GetInvoiceByID(GetInvoiceByIDRequest) returns (GetInvoiceByIDResponse);
+
+  // Get an invoice by Invoice No
+  rpc GetInvoiceByInvoiceNo(GetInvoiceByInvoiceNoRequest) returns (GetInvoiceByInvoiceNoResponse);
+
+  // List invoices
+  rpc ListInvoices(ListInvoicesRequest) returns (ListInvoicesResponse);
+
+  // Update invoice item(s)
+  rpc UpdateInvoiceItem(UpdateInvoiceItemRequest) returns (UpdateInvoiceItemResponse);
+
+  // Delete an invoice item
+  rpc DeleteInvoiceItem(DeleteInvoiceItemRequest) returns (DeleteInvoiceItemResponse);
+  
+  // Get an invoice items by Invoice ID
+  rpc GetInvoiceItemsByInvoiceID(GetInvoiceItemsByInvoiceIDRequest) returns (GetInvoiceItemsByInvoiceIDResponse);
+  
+  // Update payment info
+  rpc UpdatePaymentInfoByInvoiceID(UpdatePaymentInfoByInvoiceIDRequest) returns (UpdatePaymentInfoByInvoiceIDResponse);
+
+  // Get payment info by Invoice ID
+  rpc GetPaymentInfoByInvoiceID(GetPaymentInfoByInvoiceIDRequest) returns (GetPaymentInfoByInvoiceIDResponse);
+  
+}
+
+// Message definitions
+message Invoice {
+  uint64 id = 1;
+  google.protobuf.Timestamp  created = 2;
+  google.protobuf.Timestamp  updated = 3;
+  google.protobuf.Timestamp  deleted = 4;
+  string invoice_no = 5;
+  google.protobuf.Timestamp issue_date = 6;
+  google.protobuf.Timestamp due_date = 7;
+  string billing_currency = 8;
+  SenderDetails sender_details = 9;
+  CustomerDetails customer_details = 10;
+  repeated InvoiceItem invoice_items = 11;
+  double sub_total = 12;
+  double discount = 13;
+  double total = 14;
+  PaymentInformation payment_information = 15;
+}
+
+message InvoiceItem {
+  uint64 id = 1;
+  google.protobuf.Timestamp  created = 2;
+  google.protobuf.Timestamp  updated = 3;
+  google.protobuf.Timestamp  deleted = 4;
+  uint64 invoice_id = 5;
+  string description = 6;
+  string unit = 7;
+  double price_per_unit = 8;
+  double total = 9;
+}
+
+
+message PaymentInformation {
+  uint64 id = 1;
+  google.protobuf.Timestamp  created = 2;
+  google.protobuf.Timestamp  updated = 3;
+  google.protobuf.Timestamp  deleted = 4;
+  uint64 invoice_id = 5;
+  string account_name = 6;
+  string account_no = 7;
+  string routing_no = 8;
+  string bank_name = 9;
+  string address = 10;
+}
+
+message SenderDetails {
+  string name = 1;
+  string address = 2;
+  string email = 3;
+  string phone = 4;
+}
+
+message CustomerDetails {
+  string name = 1;
+  string address = 2;
+  string email = 3;
+  string phone = 4;
+}
+
+// request parameters for method create_invoice
+message CreateInvoiceRequest {
+  google.protobuf.Timestamp issue_date = 1;
+  google.protobuf.Timestamp due_date = 2;
+  string billing_currency = 3;
+  double discount = 4;
+  SenderDetails sender_details = 5;
+  CustomerDetails customer_details = 6;
+  repeated InvoiceItem invoice_items = 7;
+}
+
+// request parameters for method create_invoice
+message CreateInvoiceResponse {
+  int32 code = 1;
+  string message = 2;
+  uint64 id = 3;
+  string invoice_no = 4;
+}
+
+// request parameters for method update_invoice
+message UpdateInvoiceRequest {
+  uint64 id = 1;
+  google.protobuf.Timestamp issue_date = 2;
+  google.protobuf.Timestamp due_date = 3;
+  string billing_currency = 4;
+  double sub_total = 5;
+  double discount = 6;
+  double total = 7;
+  SenderDetails sender_details = 8;
+  CustomerDetails customer_details = 9;
+  repeated InvoiceItem invoice_items = 10;
+}
+
+// request parameters for method delete_invoice
+message DeleteInvoiceRequest {
+  uint64 id = 1;
+  int64 invoice_no = 2;
+}
+
+// response parameters for method delete_invoice
+message DeleteInvoiceResponse {
+  int32 code = 1;
+  int32 message = 2;
+}
+
+// request parameters for method update_invoice
+message UpdateInvoiceResponse {
+  bool success = 1;
+  string message = 2;
+  Invoice invoice = 3;
+}
+
+// request parameters for method get_invoiceby_id
+message GetInvoiceByIDRequest {
+  uint64 id = 1;
+}
+
+// response parameters for method get_invoice_by_id
+message GetInvoiceByIDResponse {
+  int32 code = 1;
+  string message = 2;
+  Invoice invoice = 3;
+}
+
+// request parameters for method get_invoice_by_invoice_no
+message GetInvoiceByInvoiceNoRequest {
+  uint64 id = 1;
+}
+
+// response parameters for method get_invoice_by_invoice_no
+message GetInvoiceByInvoiceNoResponse {
+  int32 code = 1;
+  string message = 2;
+  Invoice invoice = 3;
+}
+
+message ListInvoicesRequest {
+  int32 page_size = 1;
+  int32 page_token = 2;
+}
+
+message ListInvoicesResponse {
+  repeated Invoice invoices = 1;
+  int32 next_page_token = 2;
+}
+
+// Request message to create an invoice item
+message CreateInvoiceItemRequest {
+  uint64 invoice_id = 1;
+  string invoice_no = 2;
+  string description = 3;
+  string unit = 4;
+  double price_per_unit = 5;
+  double total = 6;
+}
+
+// Response message for creating an invoice item
+message CreateInvoiceItemResponse {
+  string invoice_no = 1;
+  string message = 2;
+}
+
+message GetInvoiceItemsByInvoiceIDRequest {
+  string invoice_no = 1;
+}
+
+message GetInvoiceItemsByInvoiceIDResponse {
+  bool success = 1;
+  string message = 2;
+  repeated InvoiceItem invoice_items = 3;
+}
+
+message UpdateInvoiceItemRequest {
+  string invoice_no = 1;
+  repeated InvoiceItem items = 2;
+}
+
+message UpdateInvoiceItemResponse {
+  bool success = 1;
+  string message = 2;
+  repeated InvoiceItem updated_items = 3;
+}
+
+message DeleteInvoiceItemRequest {
+  int64 invoice_id = 1;
+  int64 item_id = 2;
+}
+
+message DeleteInvoiceItemResponse {
+  bool success = 1;
+  string message = 2;
+}
+
+message UpdatePaymentInfoByInvoiceIDRequest {
+  string invoice_no = 1;
+  PaymentInformation payment_infomation = 2;
+}
+
+message UpdatePaymentInfoByInvoiceIDResponse {
+  bool success = 1;
+  string message = 2; 
+}
+
+message GetPaymentInfoByInvoiceIDRequest {
+  string invoice_no = 1;
+}
+
+message GetPaymentInfoByInvoiceIDResponse {
+  bool success = 1;
+  string message = 2;
+  PaymentInformation payment_infomation = 3;
+}
